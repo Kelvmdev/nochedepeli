@@ -2,6 +2,7 @@
 export const prerender = false;
 import "../../styles/global.css";
 import { sesionValida, NOMBRE_COOKIE } from "../../lib/auth";
+import { site } from "../../lib/site";
 
 const autenticado = sesionValida(Astro.cookies.get(NOMBRE_COOKIE)?.value);
 const error = Astro.url.searchParams.get("error"); // login incorrecto
@@ -131,6 +132,34 @@ const label = "block text-sm font-medium mb-1.5";
           </div>
 
           <button class="w-full bg-ambar text-noche font-semibold py-3 rounded-lg transition active:scale-95 hover:bg-ambardeep">Publicar reseña</button>
+        </form>
+
+        <h1 class="font-display text-xl font-bold mt-12 mb-5">Configuración del sitio</h1>
+        <form method="POST" action="/api/config" class="space-y-5 bg-superficie border border-linea rounded-2xl p-6 md:p-8">
+          <div>
+            <label class={label} for="tagline">Tagline (footer)</label>
+            <input id="tagline" name="tagline" value={site.tagline} class={input} />
+          </div>
+          <div>
+            <label class={label} for="email">Correo de contacto</label>
+            <input id="email" name="email" type="email" value={site.email} class={input} />
+          </div>
+          <div class="grid md:grid-cols-3 gap-5">
+            <div>
+              <label class={label} for="instagram">Instagram (URL)</label>
+              <input id="instagram" name="instagram" value={site.instagram} class={input} placeholder="https://instagram.com/..." />
+            </div>
+            <div>
+              <label class={label} for="tiktok">TikTok (URL)</label>
+              <input id="tiktok" name="tiktok" value={site.tiktok} class={input} placeholder="https://tiktok.com/@..." />
+            </div>
+            <div>
+              <label class={label} for="youtube">YouTube (URL)</label>
+              <input id="youtube" name="youtube" value={site.youtube} class={input} placeholder="https://youtube.com/@..." />
+            </div>
+          </div>
+          <p class="text-tenue text-xs">Las redes vacías no se muestran en el footer.</p>
+          <button class="w-full bg-superficie border border-ambar text-ambar font-semibold py-3 rounded-lg transition active:scale-95 hover:bg-ambar hover:text-noche">Guardar configuración</button>
         </form>
       </main>
     )}
