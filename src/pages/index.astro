@@ -1,0 +1,63 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import PeliculaCard from "../components/PeliculaCard.astro";
+import HeroCarrusel from "../components/HeroCarrusel.astro";
+import FilaSeccion from "../components/FilaSeccion.astro";
+import Anuncio from "../components/Anuncio.astro";
+import { porFecha } from "../lib/catalogo";
+
+const todas = (await getCollection("catalogo")).sort(porFecha);
+const destacadas = todas.filter((p) => p.data.destacada);
+const recientes = todas.slice(0, 8);
+const series = todas.filter((p) => p.data.tipo === "serie");
+const peliculas = todas.filter((p) => p.data.tipo === "pelicula");
+const animes = todas.filter((p) => p.data.tipo === "anime");
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "nochedepeli",
+  url: Astro.site?.href,
+  description: "Reseñas de películas y series, y dónde verlas legal en Colombia.",
+  inLanguage: "es-CO",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${Astro.site?.href}peliculas?q={query}`,
+    "query-input": "required name=query",
+  },
+};
+---
+<Layout>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <!-- HERO tipo carrusel de imagen (estilo RCN: flechas + puntitos + autoplay) -->
+  {destacadas.length > 0 && <HeroCarrusel items={destacadas} />}
+
+  <div class="film h-4 max-w-7xl mx-auto my-6"></div>
+
+  <!-- GRID DE RESEÑAS -->
+  <section class="max-w-7xl mx-auto px-[5%] py-10">
+    <div class="flex items-end justify-between mb-7">
+      <h2 class="font-display text-2xl md:text-3xl font-bold">Reseñas recientes</h2>
+      <a href="/peliculas" class="text-ambar text-sm hover:underline">Ver todas →</a>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+      {recientes.map((p) => <PeliculaCard p={p} />)}
+    </div>
+    {recientes.length === 0 && (
+      <p class="text-tenue text-center py-10">Aún no hay más reseñas. ¡Pronto!</p>
+    )}
+  </section>
+
+  <div class="film h-4 max-w-7xl mx-auto my-6"></div>
+
+  <!-- Filas por sección (cards pequeñas, estilo RCN) -->
+  <FilaSeccion titulo="Series" verTodos="/series" items={series} />
+  <FilaSeccion titulo="Películas" verTodos="/peliculas" items={peliculas} />
+  <FilaSeccion titulo="Anime" verTodos="/anime" items={animes} />
+
+  <section class="max-w-7xl mx-auto px-[5%] py-8">
+    <Anuncio />
+  </section>
+</Layout>

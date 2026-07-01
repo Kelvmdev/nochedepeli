@@ -1,0 +1,13 @@
+---
+import { seccion, type Item } from "../lib/catalogo";
+interface Props { p: Item }
+const { p } = Astro.props;
+const href = `/${seccion(p.data.tipo)}/${p.id}`;
+---
+<a href={href} class="group block w-32 md:w-40 shrink-0 snap-start">
+  <div class="rounded-lg overflow-hidden border border-linea mb-2 aspect-[2/3] relative">
+    <img src={p.data.poster} alt={`Póster de ${p.data.pelicula}`} loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+    <span class="absolute bottom-1 left-1 bg-noche/85 text-ambar text-[0.6rem] font-semibold px-1.5 py-0.5 rounded">★ {p.data.nota}</span>
+  </div>
+  <h3 class="text-xs md:text-sm font-medium leading-snug line-clamp-2 group-hover:text-ambar transition">{p.data.pelicula}</h3>
+</a>

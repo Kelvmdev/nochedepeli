@@ -1,0 +1,59 @@
+---
+const enlaces = [
+  { href: "/peliculas", texto: "Películas" },
+  { href: "/series", texto: "Series" },
+  { href: "/anime", texto: "Anime" },
+];
+---
+<header class="border-b border-linea sticky top-0 z-30 bg-noche/90 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-[5%] h-16 flex items-center justify-between gap-4">
+    <a href="/" class="font-display text-2xl font-extrabold tracking-tight shrink-0">
+      noche<span class="text-ambar">de</span>peli
+    </a>
+
+    <nav class="hidden md:flex items-center gap-7 text-sm text-tenue ml-auto mr-2" aria-label="Principal">
+      {enlaces.map((e) => <a href={e.href} class="hover:text-hueso transition">{e.texto}</a>)}
+    </nav>
+
+    <!-- Buscador tipo ícono (como RCN) -->
+    <button id="buscar-btn" class="text-hueso hover:text-ambar transition" aria-label="Buscar" aria-expanded="false" aria-controls="buscador">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M21 21l-6-6"/></svg>
+    </button>
+
+    <button id="menu-btn" class="md:hidden text-hueso" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu-movil">
+      <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h18M4 13h18M4 19h18"/></svg>
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda desplegable -->
+  <div id="buscador" class="hidden border-t border-linea bg-noche">
+    <form class="max-w-7xl mx-auto px-[5%] py-4 flex items-center gap-2" role="search" action="/peliculas">
+      <svg class="text-tenue shrink-0" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="9" r="7"/><path d="M19 19l-5-5"/></svg>
+      <input id="buscar-input" name="q" aria-label="Buscar película o serie" placeholder="Busca una película o serie…" class="bg-transparent flex-1 outline-none text-hueso placeholder:text-tenue" />
+      <button class="bg-ambar text-noche font-semibold px-5 py-2 rounded-full transition active:scale-95 hover:bg-ambardeep">Buscar</button>
+    </form>
+  </div>
+
+  <!-- Menú móvil -->
+  <nav id="menu-movil" class="md:hidden hidden border-t border-linea px-[5%] py-4 space-y-3 text-tenue" aria-label="Móvil">
+    {enlaces.map((e) => <a href={e.href} class="block hover:text-hueso transition">{e.texto}</a>)}
+  </nav>
+</header>
+
+<script>
+  const buscarBtn = document.getElementById("buscar-btn");
+  const buscador = document.getElementById("buscador");
+  const buscarInput = document.getElementById("buscar-input") as HTMLInputElement | null;
+  buscarBtn?.addEventListener("click", () => {
+    const abierto = buscador?.classList.toggle("hidden") === false;
+    buscarBtn.setAttribute("aria-expanded", String(abierto));
+    if (abierto) buscarInput?.focus();
+  });
+
+  const menuBtn = document.getElementById("menu-btn");
+  const menu = document.getElementById("menu-movil");
+  menuBtn?.addEventListener("click", () => {
+    const abierto = menu?.classList.toggle("hidden") === false;
+    menuBtn.setAttribute("aria-expanded", String(abierto));
+  });
+</script>

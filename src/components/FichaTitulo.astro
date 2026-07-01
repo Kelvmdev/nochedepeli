@@ -1,0 +1,76 @@
+---
+import { getCollection, render } from "astro:content";
+import type { Item } from "../lib/catalogo";
+import Anuncio from "./Anuncio.astro";
+interface Props { p: Item }
+const { p } = Astro.props;
+const { Content } = await render(p);
+const d = p.data;
+
+// Temporadas hermanas: otras entradas de la misma serie (se enlazan solas).
+let temporadas: Item[] = [];
+if (d.serie) {
+  temporadas = (await getCollection("catalogo"))
+    .filter((x) => x.data.serie === d.serie)
+    .sort((a, b) => (a.data.temporada ?? 0) - (b.data.temporada ?? 0));
+}
+---
+<article class="max-w-3xl mx-auto px-[5%] py-12">
+  <a href="/" class="text-tenue text-sm hover:text-hueso">← Volver</a>
+
+  <div class="mt-6 md:flex gap-8">
+    <img src={d.poster} alt={`Póster de ${d.pelicula}`} class="w-48 rounded-xl border border-linea shrink-0" />
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-ambar font-semibold">★ {d.nota}/10</span>
+        <span class="text-tenue text-sm">· {d.categoria}</span>
+        {d.tipo === "serie" && <span class="text-tenue text-sm">· Serie</span>}
+      </div>
+      <h1 class="font-display text-3xl md:text-4xl font-extrabold leading-tight">{d.titulo}</h1>
+
+      {temporadas.length > 1 && (
+        <div class="mt-4">
+          <p class="text-tenue text-xs uppercase tracking-widest mb-2">Temporadas</p>
+          <div class="flex flex-wrap gap-2">
+            {temporadas.map((t) => (
+              <a
+                href={`/series/${t.id}`}
+                aria-current={t.id === p.id ? "page" : undefined}
+                class={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+                  t.id === p.id
+                    ? "bg-ambar text-noche"
+                    : "bg-superficie border border-linea text-hueso hover:border-ambar"
+                }`}
+              >
+                Temporada {t.data.temporada}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {d.plataformas.length > 0 && (
+        <div class="mt-5">
+          <p class="text-ambar text-xs font-semibold tracking-widest uppercase mb-2">Dónde verla legal</p>
+          <div class="flex flex-wrap gap-3">
+            {d.plataformas.map((pl) => (
+              <a href={pl.url} rel="sponsored nofollow" class="flex items-center gap-2 bg-superficie border border-linea rounded-xl px-4 py-3 hover:border-ambar transition">
+                <span class="w-9 h-9 rounded-lg bg-ambar/15 text-ambar grid place-items-center font-bold">{pl.nombre[0]}</span>
+                <span><span class="block text-sm font-semibold">Ver en {pl.nombre}</span><span class="block text-xs text-tenue">{pl.tipo}</span></span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <div class="film h-4 my-8"></div>
+
+  <!-- El texto de la reseña (Markdown) -->
+  <div class="max-w-none space-y-4 leading-relaxed [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-2 [&_p]:text-hueso/90">
+    <Content />
+  </div>
+
+  <Anuncio class="mt-10" />
+</article>

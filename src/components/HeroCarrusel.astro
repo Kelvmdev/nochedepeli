@@ -1,0 +1,114 @@
+---
+import { seccion, type Item } from "../lib/catalogo";
+interface Props { items: Item[] }
+const { items } = Astro.props;
+---
+<section
+  data-hero
+  class="relative w-full h-[68vh] min-h-[420px] max-h-[760px] overflow-hidden"
+  aria-roledescription="carrusel"
+  aria-label="Destacados"
+>
+  {items.map((p, i) => (
+    <article
+      data-slide
+      data-i={i}
+      class:list={["absolute inset-0 transition-opacity duration-700", i === 0 ? "opacity-100" : "opacity-0 pointer-events-none"]}
+      aria-hidden={i === 0 ? "false" : "true"}
+    >
+      <img
+        src={p.data.backdrop ?? p.data.poster}
+        alt=""
+        class="absolute inset-0 w-full h-full object-cover"
+        loading={i === 0 ? "eager" : "lazy"}
+      />
+      <!-- oscurecido para que el texto se lea (ambiente de cine) -->
+      <div class="absolute inset-0 bg-gradient-to-t from-noche via-noche/60 to-noche/10"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-noche/80 to-transparent"></div>
+
+      <div class="relative h-full max-w-7xl mx-auto px-[5%] flex flex-col justify-end pt-24 pb-14 md:pb-20">
+        <span class="text-ambar text-xs font-semibold tracking-widest uppercase mb-3">
+          {p.data.tipo === "serie" ? "Serie" : p.data.tipo === "anime" ? "Anime" : "Película"} · Dónde verla
+        </span>
+        <h2 class="font-display text-3xl md:text-5xl font-extrabold leading-[1.15] max-w-2xl [text-shadow:0_2px_12px_rgba(0,0,0,0.6)]">
+          {p.data.titulo}
+        </h2>
+        <p class="text-hueso/80 text-base md:text-lg mt-5 max-w-xl [text-shadow:0_1px_8px_rgba(0,0,0,0.6)]">{p.data.sinopsis}</p>
+        <div>
+          <a
+            href={`/${seccion(p.data.tipo)}/${p.id}`}
+            class="inline-block mt-6 bg-ambar text-noche font-semibold px-7 py-3 rounded-full transition active:scale-95 hover:bg-ambardeep"
+          >
+            Ver dónde verla →
+          </a>
+        </div>
+      </div>
+    </article>
+  ))}
+
+  {items.length > 1 && (
+    <>
+      <!-- flechas -->
+      <button data-hero-dir="-1" aria-label="Anterior" class="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-noche/60 border border-linea grid place-items-center hover:bg-noche/90 hover:border-ambar transition active:scale-95">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5 L7 10 L12 15"/></svg>
+      </button>
+      <button data-hero-dir="1" aria-label="Siguiente" class="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-noche/60 border border-linea grid place-items-center hover:bg-noche/90 hover:border-ambar transition active:scale-95">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 5 L13 10 L8 15"/></svg>
+      </button>
+
+      <!-- puntitos -->
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+        {items.map((_, i) => (
+          <button
+            data-dot
+            data-i={i}
+            aria-label={`Ir al destacado ${i + 1}`}
+            class:list={["h-2.5 rounded-full transition-all", i === 0 ? "w-7 bg-ambar" : "w-2.5 bg-hueso/40 hover:bg-hueso/70"]}
+          ></button>
+        ))}
+      </div>
+    </>
+  )}
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-hero]").forEach((hero) => {
+    const slides = [...hero.querySelectorAll<HTMLElement>("[data-slide]")];
+    const dots = [...hero.querySelectorAll<HTMLElement>("[data-dot]")];
+    if (slides.length < 2) return;
+    let actual = 0;
+    let timer: number | undefined;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const ir = (i: number) => {
+      actual = (i + slides.length) % slides.length;
+      slides.forEach((s, n) => {
+        const on = n === actual;
+        s.classList.toggle("opacity-100", on);
+        s.classList.toggle("opacity-0", !on);
+        s.classList.toggle("pointer-events-none", !on);
+        s.setAttribute("aria-hidden", String(!on));
+      });
+      dots.forEach((d, n) => {
+        const on = n === actual;
+        d.classList.toggle("w-7", on);
+        d.classList.toggle("bg-ambar", on);
+        d.classList.toggle("w-2.5", !on);
+        d.classList.toggle("bg-hueso/40", !on);
+      });
+    };
+
+    const arrancar = () => { if (!reduce) timer = window.setInterval(() => ir(actual + 1), 6000); };
+    const parar = () => { if (timer) clearInterval(timer); };
+
+    hero.querySelectorAll<HTMLButtonElement>("[data-hero-dir]").forEach((b) =>
+      b.addEventListener("click", () => { parar(); ir(actual + Number(b.dataset.dir)); arrancar(); })
+    );
+    dots.forEach((d) =>
+      d.addEventListener("click", () => { parar(); ir(Number(d.dataset.i)); arrancar(); })
+    );
+    hero.addEventListener("mouseenter", parar);
+    hero.addEventListener("mouseleave", arrancar);
+    arrancar();
+  });
+</script>

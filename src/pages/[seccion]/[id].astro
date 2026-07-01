@@ -1,0 +1,21 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import FichaTitulo from "../../components/FichaTitulo.astro";
+import { seccion } from "../../lib/catalogo";
+
+// Genera /peliculas/<id> y /series/<id> para todo el catálogo
+export async function getStaticPaths() {
+  const items = await getCollection("catalogo");
+  return items.map((p) => ({
+    params: { seccion: seccion(p.data.tipo), id: p.id },
+    props: { p },
+  }));
+}
+
+const { p } = Astro.props;
+const d = p.data;
+---
+<Layout title={`${d.titulo} — nochedepeli`} description={d.sinopsis} image={d.poster}>
+  <FichaTitulo p={p} />
+</Layout>

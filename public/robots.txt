@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+
+# Bots de IA (GEO: permitir que las IAs citen el sitio)
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://nochedepeli.vercel.app/sitemap-index.xml

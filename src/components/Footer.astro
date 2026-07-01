@@ -1,0 +1,39 @@
+---
+const columnas = [
+  { titulo: "Explorar", links: [
+    { t: "Películas", h: "/peliculas" },
+    { t: "Series", h: "/series" },
+    { t: "Anime", h: "/anime" },
+  ]},
+  { titulo: "Legal", links: [
+    { t: "Privacidad", h: "/privacidad" },
+    { t: "Aviso de afiliados", h: "/aviso-afiliados" },
+    { t: "Contacto", h: "mailto:hola@nochedepeli.com" },
+  ]},
+  { titulo: "Síguenos", links: [
+    { t: "Instagram", h: "#" },
+    { t: "TikTok", h: "#" },
+    { t: "YouTube", h: "#" },
+  ]},
+];
+const anio = new Date().getFullYear();
+---
+<footer class="border-t border-linea mt-8">
+  <div class="max-w-7xl mx-auto px-[5%] py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+    <div class="col-span-2 md:col-span-1">
+      <p class="font-display text-xl font-extrabold mb-3">noche<span class="text-ambar">de</span>peli</p>
+      <p class="text-tenue">Tu guía para ver cine legal en Colombia.</p>
+    </div>
+    {columnas.map((c) => (
+      <div>
+        <p class="font-semibold mb-3">{c.titulo}</p>
+        <ul class="space-y-2 text-tenue">
+          {c.links.map((l) => <li><a href={l.h} class="hover:text-hueso transition">{l.t}</a></li>)}
+        </ul>
+      </div>
+    ))}
+  </div>
+  <div class="border-t border-linea py-5 text-center text-xs text-tenue">
+    © {anio} nochedepeli · Hecho con ♥ en Medellín
+  </div>
+</footer>

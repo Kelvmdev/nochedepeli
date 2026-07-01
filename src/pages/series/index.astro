@@ -1,0 +1,25 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import PeliculaCard from "../../components/PeliculaCard.astro";
+import { porFecha } from "../../lib/catalogo";
+
+const series = (await getCollection("catalogo"))
+  .filter((p) => p.data.tipo === "serie")
+  .sort(porFecha);
+---
+<Layout
+  title="Todas las series — nochedepeli"
+  description="Reseñas de series por temporadas y dónde verlas legal en Colombia."
+>
+  <section class="max-w-7xl mx-auto px-[5%] py-12">
+    <h1 class="font-display text-3xl md:text-4xl font-extrabold mb-2">Todas las series</h1>
+    <p class="text-tenue mb-8">{series.length} reseña{series.length === 1 ? "" : "s"} · por temporadas, dónde verlas legal.</p>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+      {series.map((p) => <PeliculaCard p={p} />)}
+    </div>
+
+    {series.length === 0 && <p class="text-tenue text-center py-16">Aún no hay series. ¡Pronto!</p>}
+  </section>
+</Layout>

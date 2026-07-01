@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+/* Fuentes self-host (rendimiento, tema 06) */
+@import "@fontsource/fraunces/600.css";
+@import "@fontsource/fraunces/800.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+
+/* Tokens = fuente única de estilos (tema 05). Cambiar un tono = un solo lugar. */
+@theme {
+  --color-noche: #0d0b14;
+  --color-superficie: #16131f;
+  --color-linea: #272233;
+  --color-ambar: #f5a623;
+  --color-ambardeep: #e08e0b;
+  --color-hueso: #f5f3ee;
+  --color-tenue: #9b94a8;
+
+  --font-display: "Fraunces", serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+body {
+  background: var(--color-noche);
+  color: var(--color-hueso);
+  font-family: var(--font-body);
+}
+
+/* Ambiente de cine: grano + viñeta + haz de proyector + tira de film */
+.grano::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.vineta::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+.haz {
+  background: conic-gradient(from 90deg at 50% -10%, transparent 0deg, rgba(245, 166, 35, 0.1) 12deg, transparent 24deg);
+}
+.film {
+  background:
+    repeating-linear-gradient(90deg, #0d0b14 0 14px, transparent 14px 34px) 0 0 / 100% 10px no-repeat,
+    repeating-linear-gradient(90deg, #0d0b14 0 14px, transparent 14px 34px) 0 100% / 100% 10px no-repeat,
+    #16131f;
+}
+
+/* Accesibilidad: respetar reduced-motion (tema 08) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

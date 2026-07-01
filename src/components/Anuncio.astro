@@ -1,0 +1,10 @@
+---
+// Bloque de anuncio reutilizable. Mételo donde quieras (home, ficha, listados).
+// Recomendado: 2-4 por página como máximo (más = mala UX y AdSense penaliza).
+// Cuando tengas cuenta aprobada, aquí va el <ins class="adsbygoogle" ...> real.
+interface Props { class?: string }
+const { class: clase = "" } = Astro.props;
+---
+<div class={`border border-dashed border-linea rounded-xl py-8 text-center text-tenue text-sm ${clase}`}>
+  espacio de anuncio (AdSense)
+</div>

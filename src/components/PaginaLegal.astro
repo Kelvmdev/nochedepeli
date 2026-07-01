@@ -1,0 +1,16 @@
+---
+import Layout from "../layouts/Layout.astro";
+interface Props { title: string; actualizado: string }
+const { title, actualizado } = Astro.props;
+---
+<Layout title={`${title} — nochedepeli`} description={title}>
+  <article class="max-w-2xl mx-auto px-[5%] py-12
+    [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-2
+    [&_p]:text-hueso/90 [&_p]:mb-4 [&_p]:leading-relaxed
+    [&_a]:text-ambar [&_a]:underline
+    [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:text-hueso/90 [&_ul]:space-y-1 [&_ul]:mb-4">
+    <h1 class="font-display text-3xl md:text-4xl font-extrabold mb-2">{title}</h1>
+    <p class="text-tenue text-sm mb-8">Última actualización: {actualizado}</p>
+    <slot />
+  </article>
+</Layout>

@@ -1,0 +1,51 @@
+---
+import "../styles/global.css";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+const {
+  title = "nochedepeli — Reseñas y dónde ver cine legal en Colombia",
+  description = "Reseñas honestas de películas y series, y dónde verlas legal en Colombia. Sin descargas raras.",
+  image = "/og.png",
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(image, Astro.site);
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Open Graph (tema 07): URL absoluta o el preview no carga -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+
+  <body class="grano vineta min-h-screen flex flex-col">
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:bg-ambar focus:text-noche focus:px-4 focus:py-2 focus:rounded">
+      Saltar al contenido
+    </a>
+
+    <Nav />
+    <main id="contenido" class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

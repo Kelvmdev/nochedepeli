@@ -1,0 +1,40 @@
+---
+import CardMini from "./CardMini.astro";
+import type { Item } from "../lib/catalogo";
+interface Props { titulo: string; verTodos: string; items: Item[] }
+const { titulo, verTodos, items } = Astro.props;
+---
+{items.length > 0 && (
+  <section class="relative max-w-7xl mx-auto px-[5%] py-6" aria-roledescription="carrusel" aria-label={titulo}>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display text-xl md:text-2xl font-bold">{titulo}</h2>
+      <div class="flex items-center gap-3">
+        <a href={verTodos} class="text-ambar text-sm hover:underline">Ver todos →</a>
+        <div class="hidden md:flex gap-2">
+          <button data-dir="-1" aria-label="Anterior" class="w-9 h-9 rounded-full bg-superficie border border-linea grid place-items-center hover:border-ambar transition active:scale-95">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 3 L5 8 L10 13"/></svg>
+          </button>
+          <button data-dir="1" aria-label="Siguiente" class="w-9 h-9 rounded-full bg-superficie border border-linea grid place-items-center hover:border-ambar transition active:scale-95">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3 L11 8 L6 13"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fila-track flex gap-4 overflow-x-auto snap-x pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {items.map((p) => <CardMini p={p} />)}
+    </div>
+  </section>
+)}
+
+<script>
+  document.querySelectorAll<HTMLElement>('[aria-roledescription="carrusel"]').forEach((car) => {
+    const track = car.querySelector<HTMLElement>(".fila-track");
+    if (!track) return;
+    car.querySelectorAll<HTMLButtonElement>("[data-dir]").forEach((btn) =>
+      btn.addEventListener("click", () =>
+        track.scrollBy({ left: Number(btn.dataset.dir) * track.clientWidth * 0.8, behavior: "smooth" })
+      )
+    );
+  });
+</script>
