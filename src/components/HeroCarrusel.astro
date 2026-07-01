@@ -15,6 +15,7 @@ const { items } = Astro.props;
       data-i={i}
       class:list={["absolute inset-0 transition-opacity duration-700", i === 0 ? "opacity-100" : "opacity-0 pointer-events-none"]}
       aria-hidden={i === 0 ? "false" : "true"}
+      inert={i !== 0}
     >
       <img
         src={p.data.backdrop ?? p.data.poster}
@@ -88,6 +89,7 @@ const { items } = Astro.props;
         s.classList.toggle("opacity-0", !on);
         s.classList.toggle("pointer-events-none", !on);
         s.setAttribute("aria-hidden", String(!on));
+        s.inert = !on;
       });
       dots.forEach((d, n) => {
         const on = n === actual;
