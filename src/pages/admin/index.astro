@@ -54,11 +54,17 @@ const reseñas = autenticado ? (await getCollection("catalogo")).sort(porFecha) 
         <FormResena />
 
         <h1 class="font-display text-xl font-bold mt-12 mb-5">Reseñas publicadas ({reseñas.length})</h1>
+        <p class="text-tenue text-xs mb-3">La <span class="text-ambar">★</span> marca las que salen en el carrusel destacado (hero).</p>
         <ul class="space-y-2">
           {reseñas.map((r) => (
-            <li class="flex items-center gap-3 bg-superficie border border-linea rounded-xl px-4 py-3">
+            <li class:list={["flex items-center gap-3 bg-superficie border rounded-xl px-4 py-3", r.data.destacada ? "border-ambar/50" : "border-linea"]}>
               <span class="text-xs text-tenue uppercase w-14 shrink-0">{r.data.tipo}</span>
+              <span class="text-ambar w-4 shrink-0" title={r.data.destacada ? "Destacada" : ""}>{r.data.destacada ? "★" : ""}</span>
               <span class="flex-1 text-sm truncate">{r.data.pelicula}</span>
+              <form method="POST" action="/api/destacar" class="shrink-0">
+                <input type="hidden" name="slug" value={r.id} />
+                <button class="text-sm hover:underline text-tenue hover:text-ambar">{r.data.destacada ? "Quitar destacado" : "Destacar"}</button>
+              </form>
               <a href={`/admin/editar/${r.id}`} class="text-ambar text-sm hover:underline shrink-0">Editar</a>
               <form method="POST" action="/api/borrar" onsubmit="return confirm('¿Borrar esta reseña? No se puede deshacer.')">
                 <input type="hidden" name="slug" value={r.id} />

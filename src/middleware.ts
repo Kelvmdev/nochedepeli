@@ -3,7 +3,7 @@ import { sesionValida, NOMBRE_COOKIE } from "./lib/auth";
 
 // Rutas que exigen sesión de admin. /admin (login) queda fuera: se muestra
 // el formulario cuando no hay sesión.
-const PROTEGIDAS = ["/api/crear", "/api/borrar", "/api/config", "/admin/editar"];
+const PROTEGIDAS = ["/api/crear", "/api/borrar", "/api/config", "/api/destacar", "/admin/editar"];
 
 export const onRequest = defineMiddleware(({ request, url, cookies, redirect }, next) => {
   // 1. CSRF: los POST a la API solo se aceptan si vienen del propio sitio.
