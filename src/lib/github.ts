@@ -49,3 +49,15 @@ export async function guardarArchivo(ruta: string, contenido: string, mensaje: s
   const data = await r.json();
   return data.commit?.html_url ?? "";
 }
+
+// Borra un archivo del repo (necesita su sha actual).
+export async function borrarArchivo(ruta: string, mensaje: string): Promise<void> {
+  const sha = await leerSha(ruta);
+  if (!sha) throw new Error("El archivo no existe.");
+  const r = await fetch(`${API}/repos/${OWNER}/${REPO}/contents/${ruta}`, {
+    method: "DELETE",
+    headers: headers(),
+    body: JSON.stringify({ message: mensaje, sha, branch: BRANCH }),
+  });
+  if (!r.ok) throw new Error(`GitHub DELETE ${r.status}: ${await r.text()}`);
+}

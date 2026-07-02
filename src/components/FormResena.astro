@@ -1,0 +1,108 @@
+---
+// Formulario de reseña. Sin props = crear vacío. Con "d"/"cuerpo"/"slug" = editar prefijado.
+interface Plataforma { nombre: string; tipo: string; url: string }
+interface Datos {
+  tipo?: string; pelicula?: string; titulo?: string; poster?: string; backdrop?: string;
+  nota?: number; categoria?: string; sinopsis?: string; fecha?: Date | string;
+  destacada?: boolean; serie?: string; temporada?: number; plataformas?: Plataforma[];
+}
+interface Props { d?: Datos; cuerpo?: string; slug?: string }
+const { d = {}, cuerpo = "", slug } = Astro.props;
+
+const hoy = new Date().toISOString().slice(0, 10);
+const fecha = d.fecha instanceof Date ? d.fecha.toISOString().slice(0, 10) : (d.fecha ?? hoy);
+const plat = (i: number) => d.plataformas?.[i] ?? { nombre: "", tipo: "", url: "" };
+
+const input = "w-full bg-noche border border-linea rounded-lg px-3 py-2.5 outline-none focus:border-ambar";
+const label = "block text-sm font-medium mb-1.5";
+const editando = Boolean(slug);
+---
+<form method="POST" action="/api/crear" class="space-y-5 bg-superficie border border-linea rounded-2xl p-6 md:p-8">
+  {editando && <input type="hidden" name="slug" value={slug} />}
+
+  <div>
+    <label class={label} for="tipo">Etiqueta *</label>
+    <select id="tipo" name="tipo" required class={input}>
+      <option value="pelicula" selected={d.tipo === "pelicula"}>Película</option>
+      <option value="serie" selected={d.tipo === "serie"}>Serie</option>
+      <option value="anime" selected={d.tipo === "anime"}>Anime</option>
+    </select>
+  </div>
+
+  <div>
+    <label class={label} for="pelicula">Nombre de la peli/serie *</label>
+    <input id="pelicula" name="pelicula" required value={d.pelicula} class={input} placeholder="Duna: Parte 2" />
+  </div>
+
+  <div>
+    <label class={label} for="titulo">Título SEO (el H1 de la página) *</label>
+    <input id="titulo" name="titulo" required value={d.titulo} class={input} placeholder="Dónde ver Duna: Parte 2 en Colombia (legal)" />
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-5">
+    <div>
+      <label class={label} for="poster">URL del póster (vertical) *</label>
+      <input id="poster" name="poster" required value={d.poster} class={input} placeholder="https://..." />
+    </div>
+    <div>
+      <label class={label} for="backdrop">URL imagen hero (horizontal)</label>
+      <input id="backdrop" name="backdrop" value={d.backdrop} class={input} placeholder="https://... (opcional)" />
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-5">
+    <div>
+      <label class={label} for="nota">Nota (0–10) *</label>
+      <input id="nota" name="nota" type="number" min="0" max="10" step="0.1" required value={d.nota} class={input} placeholder="9" />
+    </div>
+    <div>
+      <label class={label} for="categoria">Categoría *</label>
+      <input id="categoria" name="categoria" required value={d.categoria} class={input} placeholder="Ciencia ficción" />
+    </div>
+  </div>
+
+  <div>
+    <label class={label} for="sinopsis">Sinopsis corta (para las cards) *</label>
+    <textarea id="sinopsis" name="sinopsis" required rows="2" class={input} placeholder="De qué trata, en 1-2 líneas.">{d.sinopsis}</textarea>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-5">
+    <div>
+      <label class={label} for="fecha">Fecha *</label>
+      <input id="fecha" name="fecha" type="date" required value={fecha} class={input} />
+    </div>
+    <div>
+      <label class={label} for="serie">Serie (si es por temporadas)</label>
+      <input id="serie" name="serie" value={d.serie} class={input} placeholder="The Last of Us" />
+    </div>
+    <div>
+      <label class={label} for="temporada">Temporada #</label>
+      <input id="temporada" name="temporada" type="number" min="1" value={d.temporada} class={input} placeholder="1" />
+    </div>
+  </div>
+
+  <label class="flex items-center gap-2 text-sm">
+    <input type="checkbox" name="destacada" class="w-4 h-4 accent-ambar" checked={d.destacada} />
+    Mostrar en el carrusel destacado (hero)
+  </label>
+
+  <fieldset class="border border-linea rounded-xl p-4">
+    <legend class="text-sm text-tenue px-2">Dónde verla (hasta 3 plataformas)</legend>
+    {[0, 1, 2].map((i) => (
+      <div class="grid grid-cols-3 gap-2 mb-2">
+        <input name={`p_nombre_${i + 1}`} value={plat(i).nombre} class={input} placeholder="Max" />
+        <input name={`p_tipo_${i + 1}`} value={plat(i).tipo} class={input} placeholder="Incluida · suscripción" />
+        <input name={`p_url_${i + 1}`} value={plat(i).url} class={input} placeholder="https:// (afiliado)" />
+      </div>
+    ))}
+  </fieldset>
+
+  <div>
+    <label class={label} for="cuerpo">Reseña (texto, admite Markdown) *</label>
+    <textarea id="cuerpo" name="cuerpo" required rows="10" class={`${input} font-mono text-sm`} placeholder={"## ¿Dónde ver...?\n\nEscribe aquí tu reseña. Usa ## para títulos."}>{cuerpo}</textarea>
+  </div>
+
+  <button class="w-full bg-ambar text-noche font-semibold py-3 rounded-lg transition active:scale-95 hover:bg-ambardeep">
+    {editando ? "Guardar cambios" : "Publicar reseña"}
+  </button>
+</form>

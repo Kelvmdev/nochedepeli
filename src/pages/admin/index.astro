@@ -1,17 +1,21 @@
 ---
 export const prerender = false;
 import "../../styles/global.css";
+import { getCollection } from "astro:content";
 import { sesionValida, NOMBRE_COOKIE } from "../../lib/auth";
 import { site } from "../../lib/site";
+import { porFecha } from "../../lib/catalogo";
+import FormResena from "../../components/FormResena.astro";
 
 const autenticado = sesionValida(Astro.cookies.get(NOMBRE_COOKIE)?.value);
-const error = Astro.url.searchParams.get("error"); // login incorrecto
-const err = Astro.url.searchParams.get("err");     // error al publicar
-const ok = Astro.url.searchParams.get("ok");       // publicado con éxito
-const hoy = new Date().toISOString().slice(0, 10);
+const error = Astro.url.searchParams.get("error");
+const err = Astro.url.searchParams.get("err");
+const ok = Astro.url.searchParams.get("ok");
 
 const input = "w-full bg-noche border border-linea rounded-lg px-3 py-2.5 outline-none focus:border-ambar";
 const label = "block text-sm font-medium mb-1.5";
+
+const reseñas = autenticado ? (await getCollection("catalogo")).sort(porFecha) : [];
 ---
 <!doctype html>
 <html lang="es">
@@ -43,96 +47,26 @@ const label = "block text-sm font-medium mb-1.5";
           </div>
         </header>
 
-        {ok && <p class="bg-green-500/15 text-green-300 text-sm rounded-lg px-4 py-3 mb-6">✅ Publicado: <b>{ok}</b>. Vercel republica en ~1 minuto.</p>}
+        {ok && <p class="bg-green-500/15 text-green-300 text-sm rounded-lg px-4 py-3 mb-6">✅ Listo: <b>{ok}</b>. Vercel republica en ~1 minuto.</p>}
         {err && <p class="bg-red-500/15 text-red-300 text-sm rounded-lg px-4 py-3 mb-6">❌ {err}</p>}
 
         <h1 class="font-display text-xl font-bold mb-5">Nueva reseña</h1>
+        <FormResena />
 
-        <form method="POST" action="/api/crear" class="space-y-5 bg-superficie border border-linea rounded-2xl p-6 md:p-8">
-          <div>
-            <label class={label} for="tipo">Etiqueta *</label>
-            <select id="tipo" name="tipo" required class={input}>
-              <option value="pelicula">Película</option>
-              <option value="serie">Serie</option>
-              <option value="anime">Anime</option>
-            </select>
-          </div>
-
-          <div>
-            <label class={label} for="pelicula">Nombre de la peli/serie *</label>
-            <input id="pelicula" name="pelicula" required class={input} placeholder="Duna: Parte 2" />
-          </div>
-
-          <div>
-            <label class={label} for="titulo">Título SEO (el H1 de la página) *</label>
-            <input id="titulo" name="titulo" required class={input} placeholder="Dónde ver Duna: Parte 2 en Colombia (legal)" />
-          </div>
-
-          <div class="grid md:grid-cols-2 gap-5">
-            <div>
-              <label class={label} for="poster">URL del póster (vertical) *</label>
-              <input id="poster" name="poster" required class={input} placeholder="https://..." />
-            </div>
-            <div>
-              <label class={label} for="backdrop">URL imagen hero (horizontal)</label>
-              <input id="backdrop" name="backdrop" class={input} placeholder="https://... (opcional)" />
-            </div>
-          </div>
-
-          <div class="grid md:grid-cols-2 gap-5">
-            <div>
-              <label class={label} for="nota">Nota (0–10) *</label>
-              <input id="nota" name="nota" type="number" min="0" max="10" step="0.1" required class={input} placeholder="9" />
-            </div>
-            <div>
-              <label class={label} for="categoria">Categoría *</label>
-              <input id="categoria" name="categoria" required class={input} placeholder="Ciencia ficción" />
-            </div>
-          </div>
-
-          <div>
-            <label class={label} for="sinopsis">Sinopsis corta (para las cards) *</label>
-            <textarea id="sinopsis" name="sinopsis" required rows="2" class={input} placeholder="De qué trata, en 1-2 líneas."></textarea>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-5">
-            <div>
-              <label class={label} for="fecha">Fecha *</label>
-              <input id="fecha" name="fecha" type="date" required value={hoy} class={input} />
-            </div>
-            <div>
-              <label class={label} for="serie">Serie (si es por temporadas)</label>
-              <input id="serie" name="serie" class={input} placeholder="The Last of Us" />
-            </div>
-            <div>
-              <label class={label} for="temporada">Temporada #</label>
-              <input id="temporada" name="temporada" type="number" min="1" class={input} placeholder="1" />
-            </div>
-          </div>
-
-          <label class="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="destacada" class="w-4 h-4 accent-ambar" />
-            Mostrar en el carrusel destacado (hero)
-          </label>
-
-          <fieldset class="border border-linea rounded-xl p-4">
-            <legend class="text-sm text-tenue px-2">Dónde verla (hasta 3 plataformas)</legend>
-            {[1, 2, 3].map((i) => (
-              <div class="grid grid-cols-3 gap-2 mb-2">
-                <input name={`p_nombre_${i}`} class={input} placeholder="Max" />
-                <input name={`p_tipo_${i}`} class={input} placeholder="Incluida · suscripción" />
-                <input name={`p_url_${i}`} class={input} placeholder="https:// (afiliado)" />
-              </div>
-            ))}
-          </fieldset>
-
-          <div>
-            <label class={label} for="cuerpo">Reseña (texto, admite Markdown) *</label>
-            <textarea id="cuerpo" name="cuerpo" required rows="10" class={`${input} font-mono text-sm`} placeholder={"## ¿Dónde ver...?\n\nEscribe aquí tu reseña. Usa ## para títulos."}></textarea>
-          </div>
-
-          <button class="w-full bg-ambar text-noche font-semibold py-3 rounded-lg transition active:scale-95 hover:bg-ambardeep">Publicar reseña</button>
-        </form>
+        <h1 class="font-display text-xl font-bold mt-12 mb-5">Reseñas publicadas ({reseñas.length})</h1>
+        <ul class="space-y-2">
+          {reseñas.map((r) => (
+            <li class="flex items-center gap-3 bg-superficie border border-linea rounded-xl px-4 py-3">
+              <span class="text-xs text-tenue uppercase w-14 shrink-0">{r.data.tipo}</span>
+              <span class="flex-1 text-sm truncate">{r.data.pelicula}</span>
+              <a href={`/admin/editar/${r.id}`} class="text-ambar text-sm hover:underline shrink-0">Editar</a>
+              <form method="POST" action="/api/borrar" onsubmit="return confirm('¿Borrar esta reseña? No se puede deshacer.')">
+                <input type="hidden" name="slug" value={r.id} />
+                <button class="text-red-300 text-sm hover:underline shrink-0">Borrar</button>
+              </form>
+            </li>
+          ))}
+        </ul>
 
         <h1 class="font-display text-xl font-bold mt-12 mb-5">Configuración del sitio</h1>
         <form method="POST" action="/api/config" class="space-y-5 bg-superficie border border-linea rounded-2xl p-6 md:p-8">

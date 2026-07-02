@@ -1,0 +1,34 @@
+---
+export const prerender = false;
+import "../../../styles/global.css";
+import { getEntry } from "astro:content";
+import { sesionValida, NOMBRE_COOKIE } from "../../../lib/auth";
+import FormResena from "../../../components/FormResena.astro";
+
+if (!sesionValida(Astro.cookies.get(NOMBRE_COOKIE)?.value)) {
+  return Astro.redirect("/admin", 303);
+}
+
+const { id } = Astro.params;
+const entrada = id ? await getEntry("catalogo", id) : undefined;
+if (!entrada) return Astro.redirect("/admin?err=" + encodeURIComponent("Reseña no encontrada"), 303);
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Editar — nochedepeli</title>
+  </head>
+  <body class="min-h-screen bg-noche text-hueso">
+    <main class="max-w-2xl mx-auto px-[5%] py-12">
+      <header class="flex items-center justify-between mb-8">
+        <a href="/admin" class="text-tenue text-sm hover:text-hueso">← Volver al panel</a>
+      </header>
+      <h1 class="font-display text-xl font-bold mb-1">Editar reseña</h1>
+      <p class="text-tenue text-sm mb-5">Archivo: <b>{entrada.id}</b></p>
+      <FormResena d={entrada.data} cuerpo={entrada.body} slug={entrada.id} />
+    </main>
+  </body>
+</html>

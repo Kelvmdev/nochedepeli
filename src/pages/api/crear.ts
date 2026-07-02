@@ -48,9 +48,14 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     return redirect("/admin?err=" + encodeURIComponent("Faltan campos obligatorios."), 303);
   }
 
-  // 4. Nombre del archivo (slug). Si es serie con temporada, lo agrega.
-  const slugBase = t("slug") || slugify(datos.pelicula);
-  const slug = datos.temporada ? `${slugBase}-t${datos.temporada}` : slugBase;
+  // 4. Nombre del archivo (slug).
+  // Si viene "slug" (edición), se respeta tal cual. Si no, se genera del nombre.
+  const slugManual = t("slug");
+  const slug = slugManual
+    ? slugManual
+    : datos.temporada
+      ? `${slugify(datos.pelicula)}-t${datos.temporada}`
+      : slugify(datos.pelicula);
   const ruta = `src/content/catalogo/${slug}.md`;
 
   // 5. Guardar en GitHub
