@@ -109,7 +109,7 @@ const { items } = Astro.props;
     const parar = () => { if (timer) { clearInterval(timer); timer = undefined; } };
 
     hero.querySelectorAll<HTMLButtonElement>("[data-hero-dir]").forEach((b) =>
-      b.addEventListener("click", () => { parar(); ir(actual + Number(b.dataset.dir)); arrancar(); })
+      b.addEventListener("click", () => { parar(); ir(actual + Number(b.dataset.heroDir)); arrancar(); })
     );
     dots.forEach((d) =>
       d.addEventListener("click", () => { parar(); ir(Number(d.dataset.i)); arrancar(); })
