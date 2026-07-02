@@ -21,6 +21,14 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     youtube: t("youtube"),
   };
 
+  // Blindaje XSS: estos valores se renderizan como href en el footer.
+  // Un "javascript:..." sería XSS. Redes deben ser https://; email, formato válido.
+  const esHttps = (v: string) => !v || /^https:\/\/\S+$/.test(v);
+  const esEmail = (v: string) => !v || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
+  if (!esHttps(config.instagram) || !esHttps(config.tiktok) || !esHttps(config.youtube) || !esEmail(config.email)) {
+    return redirect("/admin?err=" + encodeURIComponent("Redes deben empezar por https:// y el correo debe ser válido."), 303);
+  }
+
   try {
     await guardarArchivo(
       "src/content/site.json",
@@ -28,7 +36,8 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
       "CMS: actualizar config del sitio"
     );
   } catch (e) {
-    return redirect("/admin?err=" + encodeURIComponent(String(e).slice(0, 120)), 303);
+    console.error("Error al guardar config en GitHub:", e); // detalle solo en el server
+    return redirect("/admin?err=" + encodeURIComponent("No se pudo guardar. Intenta de nuevo."), 303);
   }
 
   return redirect("/admin?ok=" + encodeURIComponent("configuración del sitio"), 303);

@@ -20,7 +20,8 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   try {
     await borrarArchivo(`src/content/catalogo/${slug}.md`, `CMS: borrar reseña ${slug}`);
   } catch (e) {
-    return redirect("/admin?err=" + encodeURIComponent(String(e).slice(0, 120)), 303);
+    console.error("Error al borrar en GitHub:", e); // detalle solo en el server
+    return redirect("/admin?err=" + encodeURIComponent("No se pudo borrar. Intenta de nuevo."), 303);
   }
 
   return redirect("/admin?ok=" + encodeURIComponent(`borrada ${slug}`), 303);

@@ -56,13 +56,19 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     : datos.temporada
       ? `${slugify(datos.pelicula)}-t${datos.temporada}`
       : slugify(datos.pelicula);
+  // Blindaje: el slug se mete en una ruta de archivo. Sin esto, un "../" escribiría
+  // fuera de la carpeta del catálogo (mismo patrón que ya valida borrar.ts).
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    return redirect("/admin?err=" + encodeURIComponent("Nombre de archivo inválido."), 303);
+  }
   const ruta = `src/content/catalogo/${slug}.md`;
 
   // 5. Guardar en GitHub
   try {
     await guardarArchivo(ruta, construirMarkdown(datos), `CMS: nueva reseña ${slug}`);
   } catch (e) {
-    return redirect("/admin?err=" + encodeURIComponent(String(e).slice(0, 120)), 303);
+    console.error("Error al guardar en GitHub:", e); // detalle solo en el server
+    return redirect("/admin?err=" + encodeURIComponent("No se pudo guardar. Intenta de nuevo."), 303);
   }
 
   return redirect("/admin?ok=" + encodeURIComponent(slug), 303);

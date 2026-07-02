@@ -12,6 +12,13 @@ function firmar(texto: string): string {
   return createHmac("sha256", SECRET).update(texto).digest("base64url");
 }
 
+// Compara la clave sin fugar información por tiempo. Firmamos ambas (HMAC → largo fijo)
+// y comparamos con timingSafeEqual, así ni el largo de la contraseña se filtra.
+export function claveCorrecta(clave: string): boolean {
+  if (!PASSWORD) return false;
+  return timingSafeEqual(Buffer.from(firmar(clave)), Buffer.from(firmar(PASSWORD)));
+}
+
 // Crea el valor de la cookie: "expira.firma"
 export function crearSesion(): string {
   const expira = String(Date.now() + DURACION_MS);
