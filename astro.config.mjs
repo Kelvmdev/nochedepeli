@@ -20,6 +20,6 @@ export default defineConfig({
   },
 
   integrations: [
-    sitemap({ filter: (p) => !p.includes('/admin') && !p.includes('/gracias') })
+    sitemap({ filter: (p) => !p.includes('/admin') && !p.includes('/gracias') && !p.includes('/buscar') })
   ]
 });

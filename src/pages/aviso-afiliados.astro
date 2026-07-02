@@ -1,5 +1,6 @@
 ---
 import PaginaLegal from "../components/PaginaLegal.astro";
+import { site } from "../lib/site";
 ---
 <PaginaLegal title="Aviso de afiliados" actualizado="1 de julio de 2026">
   <p>
@@ -21,6 +22,6 @@ import PaginaLegal from "../components/PaginaLegal.astro";
     gusta, te lo decimos.
   </p>
   <p>
-    ¿Dudas? Escríbenos a <a href="mailto:hola@nochedepeli.com">hola@nochedepeli.com</a>.
+    ¿Dudas? Escríbenos a <a href={`mailto:${site.email}`}>{site.email}</a>.
   </p>
 </PaginaLegal>

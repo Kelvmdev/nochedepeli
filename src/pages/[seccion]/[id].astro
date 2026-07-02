@@ -15,7 +15,31 @@ export async function getStaticPaths() {
 
 const { p } = Astro.props;
 const d = p.data;
+
+// Datos estructurados: una reseña (Review) del título. Deja que Google muestre
+// la estrella con la nota y que la IA cite la fuente.
+const tipoSchema = d.tipo === "pelicula" ? "Movie" : "TVSeries";
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Review",
+  itemReviewed: {
+    "@type": tipoSchema,
+    name: d.pelicula,
+    image: d.poster,
+    description: d.sinopsis,
+  },
+  reviewRating: {
+    "@type": "Rating",
+    ratingValue: d.nota,
+    bestRating: 10,
+    worstRating: 0,
+  },
+  author: { "@type": "Organization", name: "nochedepeli" },
+  publisher: { "@type": "Organization", name: "nochedepeli" },
+  datePublished: d.fecha.toISOString().slice(0, 10),
+  url: new URL(Astro.url.pathname, Astro.site).href,
+};
 ---
-<Layout title={`${d.titulo} — nochedepeli`} description={d.sinopsis} image={d.poster}>
+<Layout title={`${d.titulo} — nochedepeli`} description={d.sinopsis} image={d.poster} jsonLd={jsonLd}>
   <FichaTitulo p={p} />
 </Layout>

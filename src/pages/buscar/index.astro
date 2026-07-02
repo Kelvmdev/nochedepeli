@@ -1,0 +1,50 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import PeliculaCard from "../../components/PeliculaCard.astro";
+import { porFecha } from "../../lib/catalogo";
+
+// Dinámica: lee ?q= en cada petición (el sitio es estático por defecto).
+export const prerender = false;
+
+// Quita acentos y baja a minúsculas para que "duna" encuentre "Dúna".
+const norm = (s: string) =>
+  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+const q = (Astro.url.searchParams.get("q") ?? "").trim();
+const nq = norm(q);
+
+const resultados = nq
+  ? (await getCollection("catalogo"))
+      .filter((p) => norm(p.data.titulo).includes(nq) || norm(p.data.pelicula).includes(nq))
+      .sort(porFecha)
+  : [];
+---
+<Layout
+  title={q ? `Búsqueda: ${q} — nochedepeli` : "Buscar — nochedepeli"}
+  description="Busca una película, serie o anime y descubre dónde verla legal en Colombia."
+>
+  <section class="max-w-7xl mx-auto px-[5%] py-12">
+    {q ? (
+      <>
+        <h1 class="font-display text-3xl md:text-4xl font-extrabold mb-2">Resultados para “{q}”</h1>
+        <p class="text-tenue mb-8">{resultados.length} resultado{resultados.length === 1 ? "" : "s"}.</p>
+
+        {resultados.length > 0 ? (
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {resultados.map((p) => <PeliculaCard p={p} />)}
+          </div>
+        ) : (
+          <p class="text-tenue text-center py-16">
+            No encontramos nada con “{q}”. Prueba con otro título.
+          </p>
+        )}
+      </>
+    ) : (
+      <>
+        <h1 class="font-display text-3xl md:text-4xl font-extrabold mb-2">Buscar</h1>
+        <p class="text-tenue text-center py-16">Escribe un título en la barra de arriba para buscar.</p>
+      </>
+    )}
+  </section>
+</Layout>

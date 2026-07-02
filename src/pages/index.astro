@@ -23,12 +23,15 @@ const jsonLd = {
   inLanguage: "es-CO",
   potentialAction: {
     "@type": "SearchAction",
-    target: `${Astro.site?.href}peliculas?q={query}`,
+    target: `${Astro.site?.href}buscar?q={query}`,
     "query-input": "required name=query",
   },
 };
+
+// La imagen del primer destacado es el LCP: se precarga desde el <head>.
+const heroLcp = destacadas[0]?.data.backdrop ?? destacadas[0]?.data.poster;
 ---
-<Layout>
+<Layout preloadImage={heroLcp}>
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
   <!-- HERO tipo carrusel de imagen (estilo RCN: flechas + puntitos + autoplay) -->

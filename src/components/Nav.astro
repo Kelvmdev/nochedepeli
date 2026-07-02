@@ -1,9 +1,18 @@
 ---
+import { getCollection } from "astro:content";
+import { seccion } from "../lib/catalogo";
+
 const enlaces = [
   { href: "/peliculas", texto: "Películas" },
   { href: "/series", texto: "Series" },
   { href: "/anime", texto: "Anime" },
 ];
+
+// Índice liviano para sugerencias mientras se escribe (catálogo pequeño → va al cliente).
+const indice = (await getCollection("catalogo")).map((p) => ({
+  t: p.data.titulo,
+  u: `/${seccion(p.data.tipo)}/${p.id}`,
+}));
 ---
 <header class="border-b border-linea sticky top-0 z-30 bg-noche/90 backdrop-blur">
   <div class="max-w-7xl mx-auto px-[5%] h-16 flex items-center justify-between gap-4">
@@ -27,12 +36,15 @@ const enlaces = [
 
   <!-- Barra de búsqueda desplegable -->
   <div id="buscador" class="hidden border-t border-linea bg-noche">
-    <form class="max-w-7xl mx-auto px-[5%] py-4 flex items-center gap-2" role="search" action="/peliculas">
+    <form class="max-w-7xl mx-auto px-[5%] py-4 flex items-center gap-2 relative" role="search" action="/buscar">
       <svg class="text-tenue shrink-0" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="9" r="7"/><path d="M19 19l-5-5"/></svg>
-      <input id="buscar-input" name="q" aria-label="Buscar película o serie" placeholder="Busca una película o serie…" class="bg-transparent flex-1 outline-none text-hueso placeholder:text-tenue" />
+      <input id="buscar-input" name="q" autocomplete="off" aria-label="Buscar película o serie" aria-controls="buscar-sugerencias" placeholder="Busca una película o serie…" class="bg-transparent flex-1 outline-none text-hueso placeholder:text-tenue" />
       <button class="bg-ambar text-noche font-semibold px-5 py-2 rounded-full transition active:scale-95 hover:bg-ambardeep">Buscar</button>
+      <!-- Sugerencias en vivo (rellenadas por JS) -->
+      <ul id="buscar-sugerencias" class="hidden absolute left-[5%] right-[5%] top-full z-40 bg-noche border border-linea rounded-b-lg overflow-hidden shadow-xl"></ul>
     </form>
   </div>
+  <script type="application/json" id="buscar-indice" set:html={JSON.stringify(indice)}></script>
 
   <!-- Menú móvil -->
   <nav id="menu-movil" class="md:hidden hidden border-t border-linea px-[5%] py-4 space-y-3 text-tenue" aria-label="Móvil">
@@ -48,6 +60,37 @@ const enlaces = [
     const abierto = buscador?.classList.toggle("hidden") === false;
     buscarBtn.setAttribute("aria-expanded", String(abierto));
     if (abierto) buscarInput?.focus();
+  });
+
+  // Sugerencias en vivo: filtra el índice incrustado y muestra hasta 6 coincidencias.
+  const indice: { t: string; u: string }[] = JSON.parse(
+    document.getElementById("buscar-indice")?.textContent || "[]"
+  );
+  const lista = document.getElementById("buscar-sugerencias");
+  const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  buscarInput?.addEventListener("input", () => {
+    const nq = norm(buscarInput.value.trim());
+    if (!lista) return;
+    const hits = nq ? indice.filter((x) => norm(x.t).includes(nq)).slice(0, 6) : [];
+    lista.textContent = "";
+    if (hits.length === 0) { lista.classList.add("hidden"); return; }
+    for (const x of hits) {
+      const a = document.createElement("a");
+      a.href = x.u;
+      a.textContent = x.t; // textContent, no innerHTML: el título viene del CMS
+      a.className = "block px-4 py-2.5 text-sm text-hueso hover:bg-linea/50 transition";
+      const li = document.createElement("li");
+      li.append(a);
+      lista.append(li);
+    }
+    lista.classList.remove("hidden");
+  });
+  // Cerrar al hacer clic fuera o con Escape.
+  document.addEventListener("click", (e) => {
+    if (lista && !buscador?.contains(e.target as Node)) lista.classList.add("hidden");
+  });
+  buscarInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") lista?.classList.add("hidden");
   });
 
   const menuBtn = document.getElementById("menu-btn");

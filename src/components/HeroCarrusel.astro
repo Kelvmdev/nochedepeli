@@ -22,6 +22,8 @@ const { items } = Astro.props;
         alt=""
         class="absolute inset-0 w-full h-full object-cover"
         loading={i === 0 ? "eager" : "lazy"}
+        fetchpriority={i === 0 ? "high" : undefined}
+        decoding="async"
       />
       <!-- oscurecido para que el texto se lea (ambiente de cine) -->
       <div class="absolute inset-0 bg-gradient-to-t from-noche via-noche/60 to-noche/10"></div>
@@ -100,8 +102,8 @@ const { items } = Astro.props;
       });
     };
 
-    const arrancar = () => { if (!reduce) timer = window.setInterval(() => ir(actual + 1), 6000); };
-    const parar = () => { if (timer) clearInterval(timer); };
+    const arrancar = () => { if (!reduce && !timer) timer = window.setInterval(() => ir(actual + 1), 6000); };
+    const parar = () => { if (timer) { clearInterval(timer); timer = undefined; } };
 
     hero.querySelectorAll<HTMLButtonElement>("[data-hero-dir]").forEach((b) =>
       b.addEventListener("click", () => { parar(); ir(actual + Number(b.dataset.dir)); arrancar(); })

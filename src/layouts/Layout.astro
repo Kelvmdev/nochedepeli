@@ -7,11 +7,15 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  jsonLd?: object;
+  preloadImage?: string;
 }
 const {
   title = "nochedepeli — Reseñas y dónde ver cine legal en Colombia",
   description = "Reseñas honestas de películas y series, y dónde verlas legal en Colombia. Sin descargas raras.",
   image = "/og.png",
+  jsonLd,
+  preloadImage,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -25,6 +29,8 @@ const ogImage = new URL(image, Astro.site);
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {/* Adelanta la descarga de la imagen del hero (elemento LCP) */}
+    {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
@@ -35,6 +41,8 @@ const ogImage = new URL(image, Astro.site);
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
 
   <body class="grano vineta min-h-screen flex flex-col">
