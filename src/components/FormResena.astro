@@ -41,12 +41,20 @@ const editando = Boolean(slug);
 
   <div class="grid md:grid-cols-2 gap-5">
     <div>
-      <label class={label} for="poster">URL del póster (vertical) *</label>
+      <label class={label} for="poster">Póster (vertical) *</label>
       <input id="poster" name="poster" required value={d.poster} class={input} placeholder="https://..." />
+      <div class="flex items-center gap-2 mt-1.5">
+        <input type="file" accept="image/*" data-subir data-destino="poster" class="text-xs text-tenue file:mr-2 file:rounded file:border-0 file:bg-ambar file:text-noche file:px-2 file:py-1 file:font-semibold file:cursor-pointer" />
+        <span data-estado class="text-xs text-tenue"></span>
+      </div>
     </div>
     <div>
-      <label class={label} for="backdrop">URL imagen hero (horizontal)</label>
+      <label class={label} for="backdrop">Imagen hero (horizontal)</label>
       <input id="backdrop" name="backdrop" value={d.backdrop} class={input} placeholder="https://... (opcional)" />
+      <div class="flex items-center gap-2 mt-1.5">
+        <input type="file" accept="image/*" data-subir data-destino="backdrop" class="text-xs text-tenue file:mr-2 file:rounded file:border-0 file:bg-ambar file:text-noche file:px-2 file:py-1 file:font-semibold file:cursor-pointer" />
+        <span data-estado class="text-xs text-tenue"></span>
+      </div>
     </div>
   </div>
 
@@ -106,3 +114,31 @@ const editando = Boolean(slug);
     {editando ? "Guardar cambios" : "Publicar reseña"}
   </button>
 </form>
+
+<script>
+  // Subida a Cloudinary (preset sin firmar → valores públicos, sin secretos).
+  const CLOUD = "dm43alaeg";
+  const PRESET = "mirspyoz";
+
+  document.querySelectorAll<HTMLInputElement>("[data-subir]").forEach((file) => {
+    const estado = file.closest("div")?.querySelector<HTMLElement>("[data-estado]");
+    const destino = document.getElementById(file.dataset.destino!) as HTMLInputElement | null;
+    file.addEventListener("change", async () => {
+      const img = file.files?.[0];
+      if (!img || !destino) return;
+      if (estado) estado.textContent = "Subiendo…";
+      try {
+        const fd = new FormData();
+        fd.append("file", img);
+        fd.append("upload_preset", PRESET);
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, { method: "POST", body: fd });
+        if (!res.ok) throw new Error(String(res.status));
+        const data = await res.json();
+        destino.value = data.secure_url;      // rellena la URL sola
+        if (estado) estado.textContent = "✓ Subida";
+      } catch {
+        if (estado) estado.textContent = "✗ Error al subir";
+      }
+    });
+  });
+</script>

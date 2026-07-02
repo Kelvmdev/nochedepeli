@@ -1,12 +1,13 @@
 ---
 import { seccion, type Item } from "../lib/catalogo";
+import { img } from "../lib/img";
 interface Props { p: Item }
 const { p } = Astro.props;
 const href = `/${seccion(p.data.tipo)}/${p.id}`;
 ---
 <a href={href} class="group">
   <div class="rounded-xl overflow-hidden border border-linea mb-3 aspect-[2/3] relative">
-    <img src={p.data.poster} alt={`Póster de ${p.data.pelicula}`} loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+    <img src={img(p.data.poster, 500)} alt={`Póster de ${p.data.pelicula}`} loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
     {p.data.tipo === "serie" && (
       <span class="absolute top-2 left-2 bg-noche/80 text-ambar text-[0.65rem] font-semibold uppercase tracking-wide px-2 py-1 rounded">Serie</span>
     )}

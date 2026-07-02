@@ -6,6 +6,7 @@ import HeroCarrusel from "../components/HeroCarrusel.astro";
 import FilaSeccion from "../components/FilaSeccion.astro";
 import Anuncio from "../components/Anuncio.astro";
 import { porFecha } from "../lib/catalogo";
+import { img } from "../lib/img";
 
 const todas = (await getCollection("catalogo")).sort(porFecha);
 const destacadas = todas.filter((p) => p.data.destacada);
@@ -29,7 +30,7 @@ const jsonLd = {
 };
 
 // La imagen del primer destacado es el LCP: se precarga desde el <head>.
-const heroLcp = destacadas[0]?.data.backdrop ?? destacadas[0]?.data.poster;
+const heroLcp = img(destacadas[0]?.data.backdrop ?? destacadas[0]?.data.poster, 1600);
 ---
 <Layout preloadImage={heroLcp}>
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
