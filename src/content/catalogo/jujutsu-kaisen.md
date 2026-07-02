@@ -2,7 +2,8 @@
 tipo: "anime"
 pelicula: "Jujutsu Kaisen"
 titulo: "Dónde ver Jujutsu Kaisen en Colombia (legal)"
-poster: "https://placehold.co/400x600/16131f/f5a623?text=Jujutsu+Kaisen"
+poster: "https://res.cloudinary.com/dm43alaeg/image/upload/v1783006990/gvt5hspvibddt2dwltga.png"
+backdrop: "https://res.cloudinary.com/dm43alaeg/image/upload/v1783006995/ujpqelt85klp0jltaxq4.png"
 nota: 9
 categoria: "Anime · Acción"
 sinopsis: "Yuji Itadori se une a los hechiceros para combatir maldiciones. Dónde verlo legal en Colombia."
