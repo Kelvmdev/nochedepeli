@@ -1,43 +1,38 @@
-# Astro Starter Kit: Minimal
+# nochedepeli
+
+Sitio de reseñas de cine (películas / series / anime) + "dónde ver legal" en Colombia.
+Astro + Tailwind v4. En vivo: https://nochedepeli.vercel.app
+
+## Publicar contenido (día a día)
+
+Entra al panel **en producción**: https://nochedepeli.vercel.app/admin
+Crea / edita / borra reseñas y cambia la config del sitio. Al guardar, se
+commitea a GitHub y Vercel republica solo (~1 min). **No edites en local**
+para publicar (se desfasa).
+
+## Desarrollo (solo para tocar código)
 
 ```sh
-npm create astro@latest -- --template minimal
+npm run dev      # servidor local en :4321
+npm run build    # compila (genera og.png en prebuild)
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Si el CMS guardó algo: `git pull` **antes** de tocar código local (GitHub manda).
 
-## 🚀 Project Structure
+## Cómo se guarda el contenido
 
-Inside of your Astro project, you'll see the following folders and files:
+Cada reseña es un `.md` en `src/content/catalogo/`. Campo `tipo`
+(pelicula/serie/anime) = su sección. Series por temporadas: un `.md` por
+temporada con `serie` + `temporada` (se enlazan solas). Config del sitio
+(tagline, correo, redes) en `src/content/site.json`.
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+## Variables de entorno
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Ver `.env.example`. En local van en `.env.local`; en producción, en Vercel.
+Nunca subir secretos a GitHub.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Pendientes
 
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Subir imágenes con Cloudinary (hoy se pegan URLs).
+- Buscador real (la lupa aún no filtra).
+- Comprar dominio nochedepeli.com.
