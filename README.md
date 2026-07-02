@@ -33,6 +33,29 @@ Nunca subir secretos a GitHub.
 
 ## Pendientes
 
-- Subir imágenes con Cloudinary (hoy se pegan URLs).
-- Buscador real (la lupa aún no filtra).
-- Comprar dominio nochedepeli.com.
+Tuyo / de negocio:
+- **Contenido real:** pósters, links de afiliado reales (varios son `#`) y URLs
+  de redes sociales. Se cargan desde `/admin`.
+- **Dominio** nochedepeli.com (cambiar `site` en `astro.config.mjs` al comprarlo).
+- **AdSense:** los bloques `Anuncio.astro` son placeholders; se activan con cuenta
+  aprobada + tráfico.
+
+Opcional / menor:
+- Sesión revocable: cambiar `ADMIN_PASSWORD` no cierra sesiones activas (hasta 8h).
+  Para invalidarlas ahora hay que rotar `SESSION_SECRET`.
+- Unificar los parámetros de error en la URL (`?error=1` del login vs `?err=…` del
+  resto) — cosmético.
+
+Antes de "lanzar": con 2–3 reseñas reales cargadas, correr un check final
+adversarial (accesibilidad + SEO + PageSpeed en vivo con imágenes reales).
+
+## Ya hecho (auditoría jul 2026)
+
+Seguridad (path traversal en crear, XSS en config, rate-limit + comparación
+constante en login, middleware CSRF + auth central, errores de GitHub al log).
+Buscador real (`/buscar` + sugerencias en vivo en el Nav). SEO (JSON-LD Review por
+ficha). Rendimiento (preload/fetchpriority + srcset del hero). Cloudinary (subida
+desde el panel + optimización `f_auto,q_auto,w_`). Listados unificados en
+`[seccion]/index.astro`. Correo leído desde el CMS. Fix del carrusel (flechas
+dejaban el hero en negro por `data-hero-dir`). Destacar/quitar destacado desde
+la lista del panel (`/api/destacar`).
